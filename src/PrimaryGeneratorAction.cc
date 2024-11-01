@@ -25,10 +25,6 @@
 //
 /// \file PrimaryGeneratorAction.cc
 /// \brief Implementation of the PrimaryGeneratorAction class
-//
-// 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PrimaryGeneratorAction.hh"
 
@@ -40,8 +36,6 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
 :fDetector(det)
 {
@@ -49,18 +43,14 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
   G4ParticleDefinition* particle
            = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(1*MeV);    
+  fParticleGun->SetParticleEnergy(1*MeV);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
 {
   delete fParticleGun;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
@@ -68,16 +58,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //
   G4double halfSize = 0.5*(fDetector->GetSize());
   G4double x0 = - halfSize;
-  
+
   //randomize (y0,z0)
   //
-  G4double beam = 0.8*halfSize; 
+  G4double beam = 0.8*halfSize;
   G4double y0 = (2*G4UniformRand()-1.)*beam;
   G4double z0 = (2*G4UniformRand()-1.)*beam;
-  
+
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
