@@ -49,13 +49,19 @@ int main(int argc, char** argv) {
   argv = app.ensure_utf8(argv);
 
   std::string filename = "";
-  app.add_option("-f,--file", filename, "The G4 mac file");
+  app.add_option("-f,--file", filename, "The G4 mac file")->required();
 
   int n_thread = 1;
   app.add_option("-t,--n-thread", n_thread, "The number of thread to run with");
 
   ActionType action_type = kFirstInteraction;
-  app.add_option("-s,--study-type", action_type, "Which study to run");
+  std::map<std::string, ActionType> map{
+    {"FirstInteraction", ActionType::kFirstInteraction},
+    {"NeutronInteractionDistance", ActionType::kNeutronInteractionDistance},
+  };
+
+  app.add_option("-s,--study-type", action_type, "Which study to run")
+    ->transform(CLI::CheckedTransformer(map, CLI::ignore_case));
 
   CLI11_PARSE(app, argc, argv);
 
@@ -91,9 +97,8 @@ int main(int argc, char** argv) {
 
 
   //batch mode
-  G4String command = "/control/execute ";
-  G4String fileName = argv[1];
-  UImanager->ApplyCommand(command+fileName);
+  std::string command = "/control/execute ";
+  UImanager->ApplyCommand(command+filename);
 
   delete runManager;
 }
