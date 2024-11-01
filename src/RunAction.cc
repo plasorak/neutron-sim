@@ -25,6 +25,7 @@
 //
 /// \file RunAction.cc
 /// \brief Implementation of the RunAction class
+
 #include "RunAction.hh"
 #include "Run.hh"
 #include "RunMessenger.hh"
@@ -61,10 +62,10 @@ G4Run* RunAction::GenerateRun()
 {
   switch (fActionType) {
     case ActionType::kPrimaryInteraction:
-      fRun = new RunPrimaryInteraction(fDetector);
+      fRun = dynamic_cast<Run*>(new RunPrimaryInteraction(fDetector));
       return fRun;
     case ActionType::kCaptureDistance:
-      fRun = new RunCaptureDistance(fDetector);
+      fRun = dynamic_cast<Run*>(new RunCaptureDistance(fDetector));
       return fRun;
     default:
       G4ExceptionDescription msg;
@@ -83,21 +84,17 @@ void RunAction::BeginOfRunAction(const G4Run*)
 
   // keep run condition
   if (fPrimary) {
-    G4ParticleDefinition* particle
-      = fPrimary->GetParticleGun()->GetParticleDefinition();
+    G4ParticleDefinition* particle = fPrimary->GetParticleGun()->GetParticleDefinition();
     G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
     fRun->SetPrimary(particle, energy);
   }
 
   //histograms
-  //
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
   if ( analysisManager->IsActive() ) {
     analysisManager->OpenFile();
   }
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::EndOfRunAction(const G4Run*)
 {
@@ -113,8 +110,6 @@ void RunAction::EndOfRunAction(const G4Run*)
   // show Rndm status
   if (isMaster) G4Random::showEngineStatus();
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::SetPrintFlag(G4bool flag)
 {

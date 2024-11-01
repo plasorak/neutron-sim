@@ -42,20 +42,21 @@ ActionInitialization::ActionInitialization(
 { }
 
 void ActionInitialization::BuildForMaster() const {
-  SetUserAction(new RunActionPrimaryInteraction(fDetector, 0, fActionType));
+  RunAction* runAction = new RunAction(fDetector, 0, fActionType);
+  SetUserAction(runAction);
 }
 
 void ActionInitialization::Build() const {
 
-  SetUserAction(new PrimaryGeneratorAction(fDetector));
-  SetUserAction(new RunActionPrimaryInteraction(fDetector, primary, fActionType));
+  PrimaryGeneratorAction* primary = new PrimaryGeneratorAction(fDetector);
+  RunAction* runAction = new RunAction(fDetector, primary, fActionType);
 
   switch (fActionType) {
     case ActionType::kPrimaryInteraction:
-      SetUserAction(new SteppingActionPrimaryInteraction(runAction));
+      SetUserAction(new SteppingActionPrimaryInteraction());
       break;
     case ActionType::kCaptureDistance:
-      SetUserAction(new SteppingActionCaptureDistance(runAction));
+      SetUserAction(new SteppingActionCaptureDistance());
       break;
     default:
       G4Exception("ActionInitialization::Build()", "InvalidActionType",

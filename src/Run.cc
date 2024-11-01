@@ -197,7 +197,7 @@ void RunPrimaryInteraction::Merge(const G4Run* run) {
   G4Run::Merge(run);
 }
 
-void RunPrimaryInteraction::EndOfRun(G4bool print) {
+void RunCaptureDistance::EndOfRun(G4bool print) {
 
   auto e = std::string(G4BestUnit(fEkin,"Energy"));
   while (e.find(" ") != std::string::npos)
@@ -353,4 +353,12 @@ void RunPrimaryInteraction::PrintXS(
   } else {
     buffer << proc->GetProcessName() << " = " << G4BestUnit(massSigma, "Surface/Mass") << "\n";
   }
+}
+
+void RunCaptureDistance::SetFinalNuclearChannel(G4String name) {
+
+}
+
+void RunCaptureDistance::SaveDistance(const G4StepPoint* step){
+
 }

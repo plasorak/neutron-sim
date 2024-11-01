@@ -25,10 +25,6 @@
 //
 /// \file SteppingAction.cc
 /// \brief Implementation of the SteppingAction class
-//
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "SteppingAction.hh"
 #include "Run.hh"
@@ -200,8 +196,12 @@ void SteppingActionCaptureDistance::UserSteppingAction(const G4Step* aStep)
 
   G4VProcess* process = const_cast<G4VProcess*>(endPoint->GetProcessDefinedStep());
 
-  if (process != "nCaptureHP" && process != "nCapture")
+  if (process->GetProcessName() != "nCaptureHP" && process->GetProcessName() != "nCapture")
     return;
+
+  G4ParticleDefinition* particle = aStep->GetTrack()->GetDefinition();
+  G4String partName = particle->GetParticleName();
+  G4String nuclearChannel = partName;
 
   run->SaveDistance(endPoint);
   G4HadronicProcess* hproc = dynamic_cast<G4HadronicProcess*>(process);
@@ -228,7 +228,7 @@ void SteppingActionCaptureDistance::UserSteppingAction(const G4Step* aStep)
     G4String name = particle->GetParticleName();
     G4int nb = ip.second;
     if (ip.first != (*secondaries_count.begin()).first) nuclearChannel += " + ";
-    nuclearChannel += Nb + name;
+    nuclearChannel += nb + name;
   }
 
   run->SetFinalNuclearChannel(nuclearChannel);

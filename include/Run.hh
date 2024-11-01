@@ -1,4 +1,4 @@
-//
+ //
 // ********************************************************************
 // * License and Disclaimer                                           *
 // *                                                                  *
@@ -42,8 +42,13 @@ class G4HadronicProcessStore;
 class G4Material;
 class G4Element;
 
+class Run:public G4Run{
+   public:
+   virtual void EndOfRun(G4bool) = 0;
+   virtual void SetPrimary(G4ParticleDefinition*, G4double) = 0;
+};
 
-class RunPrimaryInteraction: public G4Run {
+class RunPrimaryInteraction: public Run {
 
   public:
 
@@ -120,7 +125,7 @@ class RunPrimaryInteraction: public G4Run {
 
 
 
-class RunCaptureDistance: public G4Run {
+class RunCaptureDistance: public Run {
 
   public:
 
@@ -131,11 +136,11 @@ class RunCaptureDistance: public G4Run {
     void SetTargetXXX(G4bool);
     void CountProcesses(G4VProcess* process);
     void SumTrack (G4double, G4VProcess* process);
-    void CountNuclearChannel(G4String, G4double);
+    void SetFinalNuclearChannel(G4String);
     void ParticleCount(G4String, G4double);
     void Balance(G4double) {};
     void CountGamma(G4int) {};
-
+    void SaveDistance(const G4StepPoint*);
     void Merge(const G4Run*) override;
     void EndOfRun(G4bool);
 
