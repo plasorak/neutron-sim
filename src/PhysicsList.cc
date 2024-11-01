@@ -69,8 +69,6 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 PhysicsList::PhysicsList()
 {
   G4int verb = 1;
@@ -122,8 +120,6 @@ PhysicsList::PhysicsList()
   RegisterPhysics(new G4RadioactiveDecayPhysics());
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void PhysicsList::ConstructParticle()
 {
   G4BosonConstructor  pBosonConstructor;
@@ -145,12 +141,8 @@ void PhysicsList::ConstructParticle()
   pShortLivedConstructor.ConstructParticle();
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void PhysicsList::SetCuts()
 {
   SetCutValue(0.*mm, "proton");
-  SetCutValue(0.*mm, "neutron");
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

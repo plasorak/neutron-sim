@@ -36,11 +36,11 @@
 class G4ParticleDefinition;
 
 
-class SteppingActionPrimaryInteraction : public G4UserSteppingAction
+class SteppingActionFirstInteraction : public G4UserSteppingAction
 {
   public:
-    SteppingActionPrimaryInteraction() = default;
-    ~SteppingActionPrimaryInteraction() override = default;
+    SteppingActionFirstInteraction() = default;
+    ~SteppingActionFirstInteraction() override = default;
 
     void UserSteppingAction(const G4Step*) override;
 
@@ -49,11 +49,11 @@ class SteppingActionPrimaryInteraction : public G4UserSteppingAction
 };
 
 
-class SteppingActionCaptureDistance : public G4UserSteppingAction
+class SteppingActionNeutronInteractionDistance : public G4UserSteppingAction
 {
   public:
-    SteppingActionCaptureDistance() = default;
-    ~SteppingActionCaptureDistance() override = default;
+    SteppingActionNeutronInteractionDistance() = default;
+    ~SteppingActionNeutronInteractionDistance() override = default;
 
     void UserSteppingAction(const G4Step*) override;
 };

@@ -42,40 +42,40 @@ class G4HadronicProcessStore;
 class G4Material;
 class G4Element;
 
-class Run:public G4Run{
+class RunFirstInteraction: public G4Run {
+
    public:
-   virtual void EndOfRun(G4bool) = 0;
-   virtual void SetPrimary(G4ParticleDefinition*, G4double) = 0;
-};
 
-class RunPrimaryInteraction: public Run {
+      RunFirstInteraction(DetectorConstruction*);
+      ~RunFirstInteraction() override = default;
 
-  public:
+   void SetPrimary(G4ParticleDefinition* particle, G4double energy) {
+     fParticle = particle;
+     fEkin = energy;
+   }
 
-    RunPrimaryInteraction(DetectorConstruction*);
-   ~RunPrimaryInteraction() override = default;
+   void SetTargetXXX(G4bool flag) {
+      fTargetXXX = flag;
+   }
+   void CountProcesses(G4VProcess* process);
+   void SumTrack (G4double, G4VProcess* process);
+   void CountNuclearChannel(G4String, G4double);
+   void ParticleCount(G4String, G4double);
+   void Balance(G4double) {};
+   void CountGamma(G4int) {};
 
-    void SetPrimary(G4ParticleDefinition* particle, G4double energy);
-    void SetTargetXXX(G4bool);
-    void CountProcesses(G4VProcess* process);
-    void SumTrack (G4double, G4VProcess* process);
-    void CountNuclearChannel(G4String, G4double);
-    void ParticleCount(G4String, G4double);
-    void Balance(G4double) {};
-    void CountGamma(G4int) {};
-
-    void Merge(const G4Run*) override;
-    void EndOfRun(G4bool);
+   void Merge(const G4Run*) override;
+   void EndOfRun(G4bool);
 
   private:
 
-    void PrintXS(const G4VProcess*, const G4Material*, const G4Element*,
-                 G4HadronicProcessStore*, G4double dens,
-                 G4double& sum1, G4double& sum2, std::ofstream& buffer);
+   void PrintXS(const G4VProcess*, const G4Material*, const G4Element*,
+                G4HadronicProcessStore*, G4double dens,
+                G4double& sum1, G4double& sum2, std::ofstream& buffer);
 
-    struct ParticleData {
-     ParticleData()
-        : fCount(0)
+   struct ParticleData {
+      ParticleData()
+         : fCount(0)
         , fEmean(0.)
         , fEmin(0.)
         , fEmax(0.) {}
@@ -125,77 +125,27 @@ class RunPrimaryInteraction: public Run {
 
 
 
-class RunCaptureDistance: public Run {
+class RunNeutronInteractionDistance: public G4Run {
 
   public:
 
-    RunCaptureDistance(DetectorConstruction*);
-   ~RunCaptureDistance() override = default;
+   RunNeutronInteractionDistance(DetectorConstruction* det)
+      : fDetector(det) {}
+   ~RunNeutronInteractionDistance() override = default;
 
-    void SetPrimary(G4ParticleDefinition* particle, G4double energy);
-    void SetTargetXXX(G4bool);
-    void CountProcesses(G4VProcess* process);
-    void SumTrack (G4double, G4VProcess* process);
-    void SetFinalNuclearChannel(G4String);
-    void ParticleCount(G4String, G4double);
-    void Balance(G4double) {};
-    void CountGamma(G4int) {};
-    void SaveDistance(const G4StepPoint*);
+   void SetPrimary(G4ParticleDefinition* particle, G4double energy) {
+     fParticle = particle;
+     fEkin = energy;
+   }
+   void SaveDistance(const G4StepPoint*, const G4VProcess*, const std::string);
+
     void Merge(const G4Run*) override;
     void EndOfRun(G4bool);
-
-  private:
-
-    void PrintXS(const G4VProcess*, const G4Material*, const G4Element*,
-                 G4HadronicProcessStore*, G4double dens,
-                 G4double& sum1, G4double& sum2, std::ofstream& buffer);
-
-    struct ParticleData {
-     ParticleData()
-        : fCount(0)
-        , fEmean(0.)
-        , fEmin(0.)
-        , fEmax(0.) {}
-
-     ParticleData(G4int count, G4double ekin, G4double emin, G4double emax)
-        : fCount(count)
-        , fEmean(ekin)
-        , fEmin(emin)
-        , fEmax(emax) {}
-     G4int     fCount;
-     G4double  fEmean;
-     G4double  fEmin;
-     G4double  fEmax;
-
-    };
-
-    struct NuclChannel {
-     NuclChannel()
-        : fCount(0)
-        , fQ(0.) {}
-
-     NuclChannel(G4int count, G4double Q)
-        : fCount(count)
-        , fQ(Q) {}
-     G4int     fCount;
-     G4double  fQ;
-    };
 
   private:
 
     DetectorConstruction* fDetector = nullptr;
     G4ParticleDefinition* fParticle = nullptr;
     G4double              fEkin = 0.;
-
-    std::map<G4String,G4int   > fProcCounter{};
-    std::map<G4String,G4double> fSumTrack   {};
-    std::map<G4String,G4double> fSumTrack2  {};
-
-    std::map<G4String,NuclChannel>  fNuclChannelMap {};
-    std::map<G4String,ParticleData> fParticleDataMap{};
-
-    G4bool   fTargetXXX = false;
-    G4double fPbalance[3];
-    G4int    fNbGamma[3];
 };
 

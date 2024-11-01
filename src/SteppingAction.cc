@@ -34,15 +34,15 @@
 #include "G4RunManager.hh"
 #include "G4HadronicProcess.hh"
 
-void SteppingActionPrimaryInteraction::UserSteppingAction(const G4Step* aStep)
+void SteppingActionFirstInteraction::UserSteppingAction(const G4Step* aStep)
 {
- //check trackID and stepNumber
- G4int trackID = aStep->GetTrack()->GetTrackID();
- G4int stepNb  = aStep->GetTrack()->GetCurrentStepNumber();
- if (trackID*stepNb != 1) return;
- //ok, we are at first interaction of the primary particle
+  //check trackID and stepNumber
+  G4int trackID = aStep->GetTrack()->GetTrackID();
+  G4int stepNb  = aStep->GetTrack()->GetCurrentStepNumber();
+   if (trackID*stepNb != 1) return;
+   //ok, we are at first interaction of the primary particle
 
- auto* run = static_cast<RunPrimaryInteraction*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  auto* run = static_cast<RunFirstInteraction*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
 
   const G4StepPoint* endPoint = aStep->GetPostStepPoint();
 
@@ -53,8 +53,7 @@ void SteppingActionPrimaryInteraction::UserSteppingAction(const G4Step* aStep)
 
   // count processes
   //
-  G4VProcess* process   =
-                   const_cast<G4VProcess*>(endPoint->GetProcessDefinedStep());
+  G4VProcess* process = const_cast<G4VProcess*>(endPoint->GetProcessDefinedStep());
   run->CountProcesses(process);
 
 
@@ -103,8 +102,7 @@ void SteppingActionPrimaryInteraction::UserSteppingAction(const G4Step* aStep)
 
   //secondaries
   //
-  const std::vector<const G4Track*>* secondary
-                                    = aStep->GetSecondaryInCurrentStep();
+  const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
 
   for (size_t lp=0; lp<(*secondary).size(); lp++) {
     particle = (*secondary)[lp]->GetDefinition();
@@ -178,14 +176,13 @@ void SteppingActionPrimaryInteraction::UserSteppingAction(const G4Step* aStep)
 
 
 
-void SteppingActionCaptureDistance::UserSteppingAction(const G4Step* aStep)
+void SteppingActionNeutronInteractionDistance::UserSteppingAction(const G4Step* aStep)
 {
   // check trackID and stepNumber
   G4int trackID = aStep->GetTrack()->GetTrackID();
   G4int stepNb  = aStep->GetTrack()->GetCurrentStepNumber();
-  if (trackID*stepNb != 1) return;
 
-  auto* run = static_cast<RunCaptureDistance*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  auto* run = static_cast<RunNeutronInteractionDistance*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
 
   const G4StepPoint* endPoint = aStep->GetPostStepPoint();
 
@@ -196,43 +193,22 @@ void SteppingActionCaptureDistance::UserSteppingAction(const G4Step* aStep)
 
   G4VProcess* process = const_cast<G4VProcess*>(endPoint->GetProcessDefinedStep());
 
-  if (process->GetProcessName() != "nCaptureHP" && process->GetProcessName() != "nCapture")
-    return;
-
   G4ParticleDefinition* particle = aStep->GetTrack()->GetDefinition();
   G4String partName = particle->GetParticleName();
-  G4String nuclearChannel = partName;
+  if (partName != "neutron")
+    return;
 
-  run->SaveDistance(endPoint);
   G4HadronicProcess* hproc = dynamic_cast<G4HadronicProcess*>(process);
-
   const G4Isotope* target = NULL;
-  if (hproc) target = hproc->GetTargetIsotope();
 
-  G4String targetName = "XXXX";
-  if (target) targetName = target->GetName();
+  if (hproc)
+    target = hproc->GetTargetIsotope();
 
-  nuclearChannel += " + " + targetName + " --> ";
-  if (targetName == "XXXX") run->SetTargetXXX(true);
+  std::string target_name = "XXXX";
+  if (target)
+    target_name = target->GetName();
 
-
-  const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
-  std::map<G4ParticleDefinition*,G4int> secondaries_count {};
-  for (size_t lp=0; lp<(*secondary).size(); lp++) {
-    particle = (*secondary)[lp]->GetDefinition();
-    secondaries_count[particle]++;
-  }
-
-  for (auto const& ip: secondaries_count) {
-    particle = ip.first;
-    G4String name = particle->GetParticleName();
-    G4int nb = ip.second;
-    if (ip.first != (*secondaries_count.begin()).first) nuclearChannel += " + ";
-    nuclearChannel += nb + name;
-  }
-
-  run->SetFinalNuclearChannel(nuclearChannel);
-  G4RunManager::GetRunManager()->AbortEvent();
+  run->SaveDistance(endPoint, process, target_name);
 }
 
 

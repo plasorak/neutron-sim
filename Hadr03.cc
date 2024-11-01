@@ -25,11 +25,6 @@
 //
 /// \file Hadr03.cc
 /// \brief Main program of the hadronic/Hadr03 example
-//
-//
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "G4Types.hh"
 
@@ -46,12 +41,23 @@
 #include "G4VisExecutive.hh"
 
 #include "G4ParticleHPManager.hh"
+#include "CLI11.hpp"
 
 int main(int argc, char** argv) {
 
-  //detect interactive mode (if no arguments) and define UI session
-  G4UIExecutive* ui = nullptr;
-  if (argc == 1) ui = new G4UIExecutive(argc,argv);
+  CLI::App app{"Neutron studies"};
+  argv = app.ensure_utf8(argv);
+
+  std::string filename = "";
+  app.add_option("-f,--file", filename, "The G4 mac file");
+
+  int n_thread = 1;
+  app.add_option("-t,--n-thread", n_thread, "The number of thread to run with");
+
+  ActionType action_type = kFirstInteraction;
+  app.add_option("-s,--study-type", action_type, "Which study to run");
+
+  CLI11_PARSE(app, argc, argv);
 
   //use G4SteppingVerboseWithUnits
   G4int precision = 4;
@@ -59,10 +65,7 @@ int main(int argc, char** argv) {
 
   //construct the run manager
   auto runManager = G4RunManagerFactory::CreateRunManager();
-  if (argc==3) {
-    G4int nThreads = G4UIcommand::ConvertToInt(argv[2]);
-    runManager->SetNumberOfThreads(nThreads);
-  }
+  runManager->SetNumberOfThreads(n_thread);
 
   //set mandatory initialization classes
   DetectorConstruction* det = new DetectorConstruction;
@@ -71,10 +74,7 @@ int main(int argc, char** argv) {
   PhysicsList* phys = new PhysicsList;
   runManager->SetUserInitialization(phys);
   runManager->SetUserInitialization(
-    new ActionInitialization(
-      det,
-      ActionType::kCaptureDistance
-    )
+    new ActionInitialization(det,action_type)
   );
 
   // Replaced HP environmental variables with C++ calls
@@ -86,27 +86,14 @@ int main(int argc, char** argv) {
   G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false );
   G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
 
-  //initialize visualization
-  G4VisManager* visManager = nullptr;
-
   //get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-  if (ui) {
-    //interactive mode
-    visManager = new G4VisExecutive;
-    visManager->Initialize();
-    ui->SessionStart();
-    delete ui;
-  }
-  else  {
-    //batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
-  }
 
-  //job termination
-  delete visManager;
+  //batch mode
+  G4String command = "/control/execute ";
+  G4String fileName = argv[1];
+  UImanager->ApplyCommand(command+fileName);
+
   delete runManager;
 }

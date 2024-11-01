@@ -34,8 +34,8 @@
 class DetectorConstruction;
 
 enum ActionType {
-  kPrimaryInteraction,
-  kCaptureDistance,
+  kFirstInteraction,
+  kNeutronInteractionDistance,
 };
 
 
@@ -50,7 +50,7 @@ class ActionInitialization : public G4VUserActionInitialization {
 
   private:
     DetectorConstruction* fDetector = nullptr;
-    ActionType fActionType = kPrimaryInteraction;
+    ActionType fActionType = kFirstInteraction;
 };
 
 

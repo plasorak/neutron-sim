@@ -46,32 +46,35 @@ RunAction::RunAction(DetectorConstruction* det, PrimaryGeneratorAction* prim, Ac
   , fPrimary(prim)
   , fActionType(action_type)
 {
- fHistoManager = new HistoManager();
- fRunMessenger = new RunMessenger(this);
+  fHistoManager = new HistoManager();
+  fRunMessenger = new RunMessenger(this);
 }
 
 
 RunAction::~RunAction()
 {
- delete fHistoManager;
- delete fRunMessenger;
+  delete fHistoManager;
+  delete fRunMessenger;
 }
 
 
 G4Run* RunAction::GenerateRun()
 {
   switch (fActionType) {
-    case ActionType::kPrimaryInteraction:
-      fRun = dynamic_cast<Run*>(new RunPrimaryInteraction(fDetector));
-      return fRun;
-    case ActionType::kCaptureDistance:
-      fRun = dynamic_cast<Run*>(new RunCaptureDistance(fDetector));
-      return fRun;
+    case ActionType::kFirstInteraction:
+      fRunFirstInteraction = new RunFirstInteraction(fDetector);
+      return fRunFirstInteraction;
+
+    case ActionType::kNeutronInteractionDistance:
+      fRunNeutronInteractionDistance = new RunNeutronInteractionDistance(fDetector);
+      return fRunNeutronInteractionDistance;
+
     default:
       G4ExceptionDescription msg;
       msg << "Unknown action type: " << static_cast<int>(fActionType);
       G4Exception("RunAction::GenerateRun()", "RunAction001", FatalException, msg);
       return nullptr;
+
   }
 
 }
@@ -79,36 +82,33 @@ G4Run* RunAction::GenerateRun()
 
 void RunAction::BeginOfRunAction(const G4Run*)
 {
-  // show Rndm status
-  if (isMaster) G4Random::showEngineStatus();
-
-  // keep run condition
   if (fPrimary) {
+
     G4ParticleDefinition* particle = fPrimary->GetParticleGun()->GetParticleDefinition();
     G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
-    fRun->SetPrimary(particle, energy);
+
+    if (fRunFirstInteraction)
+      fRunFirstInteraction->SetPrimary(particle, energy);
+
+    if (fRunNeutronInteractionDistance)
+      fRunNeutronInteractionDistance->SetPrimary(particle, energy);
+
   }
 
-  //histograms
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  if ( analysisManager->IsActive() ) {
-    analysisManager->OpenFile();
-  }
 }
 
 void RunAction::EndOfRunAction(const G4Run*)
 {
-  if (isMaster) fRun->EndOfRun(fPrint);
 
-  //save histograms
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  if ( analysisManager->IsActive() ) {
-    analysisManager->Write();
-    analysisManager->CloseFile();
+  if (isMaster) {
+
+    if (fRunFirstInteraction)
+      fRunFirstInteraction->EndOfRun(fPrint);
+
+    if (fRunNeutronInteractionDistance)
+      fRunNeutronInteractionDistance->EndOfRun(fPrint);
   }
 
-  // show Rndm status
-  if (isMaster) G4Random::showEngineStatus();
 }
 
 void RunAction::SetPrintFlag(G4bool flag)

@@ -32,8 +32,6 @@
 #include "RunAction.hh"
 #include "SteppingAction.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 ActionInitialization::ActionInitialization(
   DetectorConstruction* detector,
   ActionType action_type)
@@ -52,11 +50,11 @@ void ActionInitialization::Build() const {
   RunAction* runAction = new RunAction(fDetector, primary, fActionType);
 
   switch (fActionType) {
-    case ActionType::kPrimaryInteraction:
-      SetUserAction(new SteppingActionPrimaryInteraction());
+    case ActionType::kFirstInteraction:
+      SetUserAction(new SteppingActionFirstInteraction());
       break;
-    case ActionType::kCaptureDistance:
-      SetUserAction(new SteppingActionCaptureDistance());
+    case ActionType::kNeutronInteractionDistance:
+      SetUserAction(new SteppingActionNeutronInteractionDistance());
       break;
     default:
       G4Exception("ActionInitialization::Build()", "InvalidActionType",

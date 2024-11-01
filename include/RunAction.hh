@@ -35,7 +35,8 @@
 #include "ActionInitialization.hh"
 
 class DetectorConstruction;
-class Run;
+class RunFirstInteraction;
+class RunNeutronInteractionDistance;
 class RunMessenger;
 class PrimaryGeneratorAction;
 class HistoManager;
@@ -55,13 +56,14 @@ class RunAction : public G4UserRunAction {
     void SetPrintFlag(G4bool);
 
   private:
-    DetectorConstruction*      fDetector     = nullptr;
-    PrimaryGeneratorAction*    fPrimary      = nullptr;
-    Run*                       fRun          = nullptr;
-    HistoManager*              fHistoManager = nullptr;
-    RunMessenger*              fRunMessenger = nullptr;
+    DetectorConstruction*          fDetector = nullptr;
+    PrimaryGeneratorAction*        fPrimary = nullptr;
+    RunFirstInteraction*           fRunFirstInteraction = nullptr;
+    RunNeutronInteractionDistance* fRunNeutronInteractionDistance = nullptr;
+    HistoManager*                  fHistoManager = nullptr;
+    RunMessenger*                  fRunMessenger = nullptr;
 
-    ActionType fActionType = ActionType::kPrimaryInteraction;
+    ActionType fActionType = ActionType::kFirstInteraction;
     G4bool   fPrint = true;      //optional printing
 };
 

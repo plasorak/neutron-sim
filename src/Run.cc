@@ -43,7 +43,7 @@
 #include <numeric>
 #include <iterator>
 
-RunPrimaryInteraction::RunPrimaryInteraction(DetectorConstruction* det)
+RunFirstInteraction::RunFirstInteraction(DetectorConstruction* det)
 : fDetector(det) {
 
   for (G4int i=0; i<3; i++)
@@ -52,16 +52,8 @@ RunPrimaryInteraction::RunPrimaryInteraction(DetectorConstruction* det)
   fPbalance[1] = DBL_MAX;
 }
 
-void RunPrimaryInteraction::SetPrimary(G4ParticleDefinition* particle, G4double energy) {
-  fParticle = particle;
-  fEkin = energy;
-}
 
-void RunPrimaryInteraction::SetTargetXXX(G4bool flag) {
-  fTargetXXX = flag;
-}
-
-void RunPrimaryInteraction::CountProcesses(G4VProcess* process) {
+void RunFirstInteraction::CountProcesses(G4VProcess* process) {
 
   if (process == nullptr)
     return;
@@ -78,7 +70,8 @@ void RunPrimaryInteraction::CountProcesses(G4VProcess* process) {
 
 }
 
-void RunPrimaryInteraction::SumTrack(G4double trackl, G4VProcess* process) {
+
+void RunFirstInteraction::SumTrack(G4double trackl, G4VProcess* process) {
 
   if (process == nullptr)
     return;
@@ -97,7 +90,8 @@ void RunPrimaryInteraction::SumTrack(G4double trackl, G4VProcess* process) {
 
 }
 
-void RunPrimaryInteraction::CountNuclearChannel(G4String name, G4double Q) {
+
+void RunFirstInteraction::CountNuclearChannel(G4String name, G4double Q) {
 
   auto it = fNuclChannelMap.find(name);
 
@@ -111,7 +105,7 @@ void RunPrimaryInteraction::CountNuclearChannel(G4String name, G4double Q) {
 }
 
 
-void RunPrimaryInteraction::ParticleCount(G4String name, G4double Ekin) {
+void RunFirstInteraction::ParticleCount(G4String name, G4double Ekin) {
 
   auto it = fParticleDataMap.find(name);
 
@@ -129,9 +123,10 @@ void RunPrimaryInteraction::ParticleCount(G4String name, G4double Ekin) {
   }
 }
 
-void RunPrimaryInteraction::Merge(const G4Run* run) {
 
-  auto const* localRun = static_cast<const RunPrimaryInteraction*>(run);
+void RunFirstInteraction::Merge(const G4Run* run) {
+
+  auto const* localRun = static_cast<const RunFirstInteraction*>(run);
 
   fParticle = localRun->fParticle;
   fEkin     = localRun->fEkin;
@@ -197,7 +192,7 @@ void RunPrimaryInteraction::Merge(const G4Run* run) {
   G4Run::Merge(run);
 }
 
-void RunCaptureDistance::EndOfRun(G4bool print) {
+void RunFirstInteraction::EndOfRun(G4bool print) {
 
   auto e = std::string(G4BestUnit(fEkin,"Energy"));
   while (e.find(" ") != std::string::npos)
@@ -333,7 +328,7 @@ void RunCaptureDistance::EndOfRun(G4bool print) {
   data_file.close();
 }
 
-void RunPrimaryInteraction::PrintXS(
+void RunFirstInteraction::PrintXS(
   const G4VProcess* proc,
   const G4Material* mat, const G4Element* elm,
   G4HadronicProcessStore* store, G4double density,
@@ -355,10 +350,6 @@ void RunPrimaryInteraction::PrintXS(
   }
 }
 
-void RunCaptureDistance::SetFinalNuclearChannel(G4String name) {
-
-}
-
-void RunCaptureDistance::SaveDistance(const G4StepPoint* step){
-
-}
+  void RunNeutronInteractionDistance::SaveDistance(const G4StepPoint*, const G4VProcess*, const std::string){}
+  void RunNeutronInteractionDistance::Merge(const G4Run*) {}
+  void RunNeutronInteractionDistance::EndOfRun(G4bool) {}
