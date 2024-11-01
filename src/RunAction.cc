@@ -44,22 +44,22 @@
 RunAction::RunAction(DetectorConstruction* det, PrimaryGeneratorAction* prim, ActionType action_type)
   : fDetector(det)
   , fPrimary(prim)
-  , fActionType(action_type)
-{
+  , fActionType(action_type) {
+
   fHistoManager = new HistoManager();
   fRunMessenger = new RunMessenger(this);
 }
 
 
-RunAction::~RunAction()
-{
+RunAction::~RunAction() {
+
   delete fHistoManager;
   delete fRunMessenger;
 }
 
 
-G4Run* RunAction::GenerateRun()
-{
+G4Run* RunAction::GenerateRun() {
+
   switch (fActionType) {
     case ActionType::kFirstInteraction:
       fRunFirstInteraction = new RunFirstInteraction(fDetector);
@@ -80,10 +80,9 @@ G4Run* RunAction::GenerateRun()
 }
 
 
-void RunAction::BeginOfRunAction(const G4Run*)
-{
-  if (fPrimary) {
+void RunAction::BeginOfRunAction(const G4Run*) {
 
+  if (fPrimary) {
     G4ParticleDefinition* particle = fPrimary->GetParticleGun()->GetParticleDefinition();
     G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
 
@@ -92,27 +91,21 @@ void RunAction::BeginOfRunAction(const G4Run*)
 
     if (fRunNeutronInteractionDistance)
       fRunNeutronInteractionDistance->SetPrimary(particle, energy);
-
   }
-
 }
 
-void RunAction::EndOfRunAction(const G4Run*)
-{
+void RunAction::EndOfRunAction(const G4Run*) {
 
   if (isMaster) {
-
     if (fRunFirstInteraction)
       fRunFirstInteraction->EndOfRun(fPrint);
 
     if (fRunNeutronInteractionDistance)
       fRunNeutronInteractionDistance->EndOfRun(fPrint);
   }
-
 }
 
-void RunAction::SetPrintFlag(G4bool flag)
-{
+void RunAction::SetPrintFlag(G4bool flag) {
   fPrint = flag;
 }
 

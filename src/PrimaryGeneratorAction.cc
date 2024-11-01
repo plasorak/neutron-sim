@@ -37,8 +37,8 @@
 #include "Randomize.hh"
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
-:fDetector(det)
-{
+: fDetector(det) {
+
   fParticleGun  = new G4ParticleGun(1);
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   fParticleGun->SetParticleDefinition(particle);
@@ -46,20 +46,17 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
 }
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
+PrimaryGeneratorAction::~PrimaryGeneratorAction() {
   delete fParticleGun;
 }
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+
   //this function is called at the begining of event
-  //
   G4double halfSize = 0.5*(fDetector->GetSize());
   G4double x0 = - halfSize;
 
   //randomize (y0,z0)
-  //
   G4double beam = 0.8*halfSize;
   G4double y0 = (2*G4UniformRand()-1.)*beam;
   G4double z0 = (2*G4UniformRand()-1.)*beam;

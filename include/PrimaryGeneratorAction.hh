@@ -27,8 +27,7 @@
 /// \brief Definition of the PrimaryGeneratorAction class
 
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#pragma once
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
@@ -37,20 +36,17 @@
 class G4Event;
 class DetectorConstruction;
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
+class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
+
   public:
     PrimaryGeneratorAction(DetectorConstruction*);
    ~PrimaryGeneratorAction() override;
 
-  public:
     void GeneratePrimaries(G4Event*) override;
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
+    G4ParticleGun* GetParticleGun() { return fParticleGun; };
 
   private:
     G4ParticleGun*        fParticleGun = nullptr;
     DetectorConstruction* fDetector = nullptr;
 };
-
-#endif
 
