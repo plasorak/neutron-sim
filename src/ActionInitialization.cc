@@ -47,7 +47,9 @@ void ActionInitialization::BuildForMaster() const {
 void ActionInitialization::Build() const {
 
   PrimaryGeneratorAction* primary = new PrimaryGeneratorAction(fDetector);
+  SetUserAction(primary);
   RunAction* runAction = new RunAction(fDetector, primary, fActionType);
+  SetUserAction(runAction);
 
   switch (fActionType) {
     case ActionType::kFirstInteraction:
