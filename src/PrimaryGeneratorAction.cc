@@ -40,8 +40,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
 :fDetector(det)
 {
   fParticleGun  = new G4ParticleGun(1);
-  G4ParticleDefinition* particle
-           = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
+  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleEnergy(1*MeV);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
